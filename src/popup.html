@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>深夜护眼</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="head">
+      <div class="brand">
+        <span class="moon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+            <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"
+              fill="currentColor" opacity=".95" />
+          </svg>
+        </span>
+        <div class="brand-text">
+          <h1>深夜护眼</h1>
+          <p>力扣夜间主题</p>
+        </div>
+      </div>
+      <button id="switch" class="switch" role="switch" aria-checked="true" aria-label="开启主题">
+        <span class="knob"></span>
+      </button>
+    </header>
+
+    <main class="body">
+      <section class="row" id="rowWarm">
+        <div class="row-head">
+          <label for="warm">暖色强度</label>
+          <span class="val" id="warmVal">12%</span>
+        </div>
+        <input id="warm" type="range" min="0" max="100" step="1" value="12" />
+        <div class="hint"><span>冷</span><span>暖</span></div>
+      </section>
+
+      <section class="row" id="rowDim">
+        <div class="row-head">
+          <label for="dim">再压暗一点</label>
+          <span class="val" id="dimVal">0%</span>
+        </div>
+        <input id="dim" type="range" min="0" max="60" step="1" value="0" />
+        <div class="hint"><span>亮</span><span>暗</span></div>
+      </section>
+
+      <div class="presets">
+        <button class="preset" data-warm="0" data-dim="0">标准夜</button>
+        <button class="preset" data-warm="20" data-dim="10">柔和</button>
+        <button class="preset" data-warm="40" data-dim="25">极护眼</button>
+      </div>
+
+      <div class="keys">
+        <kbd>Alt</kbd><kbd>Shift</kbd><kbd>N</kbd><span>开关</span>
+      </div>
+    </main>
+
+    <footer class="foot">
+      <a href="https://leetcode.cn/problemset/" target="_blank" rel="noopener">去刷题</a>
+      <span class="dot">·</span>
+      <button id="reset" class="link">恢复默认</button>
+    </footer>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

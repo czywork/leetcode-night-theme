@@ -1,0 +1,705 @@
+/* ============================================================================
+   深夜护眼 · 力扣夜间主题  v1.0
+   ----------------------------------------------------------------------------
+   实现思路（不靠逐元素打补丁）：
+   1. 力扣用一套语义化 CSS 变量（--layer-01 / --text-primary / --sd-* …）驱动
+      全站配色。本站是「亮色 :root + 暗色 html.dark」双套映射。
+      本主题直接在 html[data-lc-night="on"] 上把这些语义变量全部重映射到暖色系，
+      因此所有组件（面板、弹窗、下拉、表格、标签…）自动继承，无需逐个覆盖。
+   2. 选择器使用 html[data-lc-night="on"]（特指度 0,1,1），高于站点的 :root（0,1,0），
+      即使站点把 dark 类抢回去，配色依然成立 —— 不依赖站点自身状态。
+   3. 代码编辑器 Monaco 的主题被硬编码为浅色 vs，令牌色写死在 .mtk1~.mtk32，
+      无法通过变量覆盖，必须单独改色；这也是插件存在的最大价值。
+   4. 最后一层可调暖色/压暗遮罩，做「护眼」的软性调节。
+   ========================================================================== */
+
+html[data-lc-night="on"] {
+  color-scheme: dark;
+
+  /* ---------------- 原始色阶（本主题自有，--lcn- 前缀避免冲突） ------------- */
+  --lcn-bg-deep: #100d0c;      /* 最底：页面背板 */
+  --lcn-bg: #16120f;           /* 主背景 */
+  --lcn-surface-1: #1b1714;    /* 代码编辑器 / 深一层卡片 */
+  --lcn-surface-2: #221d19;    /* 主面板 */
+  --lcn-surface-3: #2b2521;    /* 悬浮层 / 输入框 */
+  --lcn-surface-4: #37302a;    /* 更深一档的强调底 */
+
+  --lcn-text-1: #ede4d8;       /* 正文主字 */
+  --lcn-text-2: rgba(243, 232, 218, 0.8);
+  --lcn-text-3: rgba(240, 228, 212, 0.62);
+  --lcn-text-4: rgba(236, 224, 206, 0.44);
+
+  --lcn-amber: #e9a94f;        /* 品牌强调 */
+  --lcn-amber-dim: #c08f4a;
+  --lcn-line: rgba(255, 226, 190, 0.1);
+  --lcn-line-strong: rgba(255, 226, 190, 0.16);
+
+  /* ---------------- 中性灰阶：暖炭黑 → 象牙白 ---------------- */
+  --pure-white: #f2e7da;
+  --pure-black: #14100e;
+
+  --dark-gray-black: var(--lcn-bg-deep);
+  --dark-gray-10: var(--lcn-surface-1);
+  --dark-gray-20: var(--lcn-surface-2);
+  --dark-gray-30: var(--lcn-surface-3);
+  --dark-gray-40: var(--lcn-surface-4);
+  --dark-gray-50: #514640;
+  --dark-gray-60: #6e6158;
+  --dark-gray-70: #93867b;
+  --dark-gray-80: #bcae9f;
+  --dark-gray-90: #d9c9b7;
+  --dark-gray-100: #f0e4d5;
+
+  --gray-10: var(--lcn-surface-1);
+  --gray-20: var(--lcn-surface-2);
+  --gray-40: var(--lcn-surface-4);
+  --gray-60: #6e6158;
+  --gray-80: #bcae9f;
+  --gray-100: #f0e4d5;
+
+  /* 亮色阶也一并压暖，避免站点亮色代码路径串出冷白 */
+  --light-gray-10: #1a1614;
+  --light-gray-20: #221d19;
+  --light-gray-30: #2b2521;
+  --light-gray-40: #514640;
+  --light-gray-50: #93867b;
+  --light-gray-60: #bcae9f;
+  --light-gray-70: #d9c9b7;
+  --light-gray-80: #e6d8c8;
+  --light-gray-90: #ede1d4;
+  --light-gray-100: #f0e4d5;
+  --light-gray-white: var(--lcn-bg);
+
+  /* ---------------- 半透明层：暖白，杜绝发蓝的冷灰 ---------------- */
+  --opacity-white-10: rgba(255, 226, 190, 0.055);
+  --opacity-white-20: rgba(255, 226, 190, 0.085);
+  --opacity-white-30: rgba(255, 226, 190, 0.115);
+  --opacity-white-40: rgba(255, 226, 190, 0.155);
+  --opacity-white-50: rgba(255, 226, 190, 0.215);
+  --opacity-white-60: rgba(255, 230, 200, 0.32);
+  --opacity-white-70: rgba(245, 232, 216, 0.58);
+  --opacity-white-80: rgba(245, 234, 220, 0.8);
+  --opacity-white-90: rgba(248, 239, 228, 0.93);
+  --opacity-white-100: #f2e7da;
+
+  --opacity-black-10: rgba(0, 0, 0, 0.2);
+  --opacity-black-20: rgba(0, 0, 0, 0.3);
+  --opacity-black-30: rgba(0, 0, 0, 0.4);
+  --opacity-black-40: rgba(0, 0, 0, 0.5);
+  --opacity-black-50: rgba(0, 0, 0, 0.6);
+  --opacity-black-60: rgba(0, 0, 0, 0.7);
+  --opacity-black-70: rgba(0, 0, 0, 0.8);
+  --opacity-black-80: rgba(0, 0, 0, 0.88);
+  --opacity-black-90: rgba(0, 0, 0, 0.94);
+  --opacity-black-100: #000;
+
+  /* ---------------- 语义映射：等价于站点 .dark 块，但不依赖它 ---------------- */
+  --layer-01: var(--lcn-surface-2);
+  --layer-02: var(--lcn-surface-3);
+  --layer-03: var(--lcn-surface-4);
+  --layer-bg-pure: var(--lcn-bg);
+  --layer-bg-gray: var(--lcn-bg);
+
+  --text-primary: var(--lcn-text-1);
+  --text-secondary: var(--lcn-text-2);
+  --text-tertiary: var(--lcn-text-3);
+  --text-quaternary: var(--lcn-text-4);
+  --text-reverse: #14100e;
+
+  --fill-primary: var(--opacity-white-40);
+  --fill-secondary: var(--opacity-white-30);
+  --fill-tertiary: var(--opacity-white-20);
+  --fill-quaternary: var(--opacity-white-10);
+  --fill-pure: #14100e;
+
+  --border-primary: var(--opacity-white-60);
+  --border-secondary: var(--opacity-white-50);
+  --border-tertiary: var(--opacity-white-40);
+  --border-quaternary: var(--opacity-white-30);
+
+  /* 品牌 */
+  --brand-orange: var(--lcn-amber);
+  --brand-gray: #a1928a;
+  --brand-logo: #f2e7da;
+  --dark-brand-orange: var(--lcn-amber);
+  --dark-brand-gray: #a1928a;
+  --dark-brand-white: #f2e7da;
+  --dark-brand-black: #000;
+
+  /* 难度：色相保留，饱和度压低，夜里不刺眼 */
+  --dark-teal-60: #6faa9c;
+  --dark-teal-10: #17302c;
+  --dark-teal-20: #1e3f39;
+  --dark-yellow-60: #d9a846;
+  --dark-yellow-10: #33280f;
+  --dark-yellow-20: #473713;
+  --dark-red-60: #cf7f72;
+  --dark-red-10: #331712;
+  --dark-red-20: #47201a;
+
+  --teal-10: #17302c;
+  --teal-20: #1e3f39;
+  --teal-40: #2f5c55;
+  --teal-60: #6faa9c;
+  --teal-80: #8fc4b7;
+  --teal-100: #c8e6de;
+
+  --yellow-10: #33280f;
+  --yellow-20: #473713;
+  --yellow-40: #8a6a24;
+  --yellow-60: #d9a846;
+  --yellow-80: #e8bf6a;
+  --yellow-100: #f6e4b8;
+  --dark-opacity-yellow-60: rgba(233, 169, 79, 0.16);
+  --light-opacity-yellow-60: rgba(233, 169, 79, 0.16);
+  --opacity-yellow-60: rgba(233, 169, 79, 0.16);
+
+  --red-10: #331712;
+  --red-20: #47201a;
+  --red-40: #8f4a40;
+  --red-60: #cf7f72;
+  --red-80: #dda093;
+  --red-100: #f2cdc6;
+
+  --green-10: #172a1a;
+  --green-20: #1f3a23;
+  --green-40: #3f6b47;
+  --green-60: #79ad82;
+  --green-80: #96c29c;
+  --green-100: #d8efdb;
+
+  --dark-green-60: #79ad82;
+  --dark-green-10: #172a1a;
+  --dark-green-20: #1f3a23;
+
+  --blue-10: #142235;
+  --blue-20: #1b2f49;
+  --blue-40: #2c4a6e;
+  --blue-60: #6f9fd0;
+  --blue-80: #8fb3dd;
+  --blue-100: #dcebff;
+
+  --dark-blue-60: #6f9fd0;
+  --dark-blue-10: #142235;
+  --dark-blue-20: #1b2f49;
+
+  --purple-10: #22182a;
+  --purple-20: #2f2139;
+  --purple-40: #56406b;
+  --purple-60: #b18cc4;
+  --purple-80: #c4a6d3;
+  --purple-100: #eadcf2;
+
+  --dark-purple-60: #b18cc4;
+  --dark-purple-10: #22182a;
+  --dark-purple-20: #2f2139;
+
+  --magenta-10: #2c1720;
+  --magenta-20: #3d1f2c;
+  --magenta-40: #7a4056;
+  --magenta-60: #c78ba5;
+  --magenta-80: #d8a8bc;
+  --magenta-100: #f2dde6;
+
+  --dark-magenta-60: #c78ba5;
+  --dark-magenta-10: #2c1720;
+  --dark-magenta-20: #3d1f2c;
+
+  --difficulty-easy: #6faa9c;
+  --difficulty-medium: #d9a846;
+  --difficulty-hard: #cf7f72;
+
+  --message-danger: #cf7f72;
+  --message-warning: #d9a846;
+  --message-primary: #6f9fd0;
+  --message-success: #79ad82;
+
+  --special-rose: #cf7f72;
+  --special-sunny: #d9a846;
+  --special-kiwi: #79ad82;
+  --special-skyler: #6f9fd0;
+  --special-lavender: #b18cc4;
+  --dark-special-rose: #cf7f72;
+  --dark-special-sunny: #d9a846;
+  --dark-special-kiwi: #79ad82;
+  --dark-special-skyler: #6f9fd0;
+  --dark-special-lavender: #b18cc4;
+
+  --fixed-black: var(--pure-black);
+  --fixed-white: var(--pure-white);
+
+  /* 第二套设计系统（HSL 三元组） */
+  --sd-background: 20 12% 8%;
+  --sd-background-gray: 20 12% 6%;
+  --sd-foreground: 34 40% 89%;
+  --sd-card: 22 12% 12%;
+  --sd-card-foreground: 34 40% 89%;
+  --sd-popover: 22 12% 15%;
+  --sd-popover-foreground: 34 40% 92%;
+  --sd-primary: 34 40% 89%;
+  --sd-primary-foreground: 22 14% 9%;
+  --sd-secondary: 22 11% 17%;
+  --sd-secondary-foreground: 34 40% 92%;
+  --sd-muted: 22 11% 17%;
+  --sd-muted-foreground: 30 18% 62%;
+  --sd-accent: 30 40% 88% / 0.09;
+  --sd-accent-foreground: 34 40% 92%;
+  --sd-border: 30 40% 88% / 0.11;
+  --sd-input: 30 40% 88% / 0.14;
+  --sd-ring: 30 30% 70%;
+  --sd-gray-50: 22 12% 14%;
+  --sd-gray-100: 22 12% 18%;
+  --sd-gray-200: 22 12% 22%;
+  --sd-gray-300: 26 12% 30%;
+  --sd-gray-400: 28 12% 42%;
+  --sd-gray-500: 30 14% 55%;
+  --sd-gray-600: 32 18% 68%;
+  --sd-gray-700: 34 24% 80%;
+  --sd-gray-800: 34 30% 86%;
+  --sd-gray-900: 34 34% 90%;
+  --sd-gray-950: 34 40% 94%;
+
+  /* 阴影：暖黑，不用冷灰 */
+  --light-shadow-layer-1: 0 0 1px 0 rgba(0, 0, 0, 0.5), 0 0.5px 5px 0 rgba(0, 0, 0, 0.4);
+  --light-shadow-layer-1-hover: 0 0 1px 0 rgba(0, 0, 0, 0.5), 0 4px 8px 0 rgba(0, 0, 0, 0.55);
+  --light-shadow-layer-2: 0 0 1px 0 rgba(0, 0, 0, 0.6), 0 0 1px 0 rgba(0, 0, 0, 0.4), 0 7px 22px 0 rgba(0, 0, 0, 0.6);
+  --light-shadow-layer-3: 0 0 2px 0 rgba(0, 0, 0, 0.6), 0 38px 90px 0 rgba(0, 0, 0, 0.7);
+  --dark-shadow-layer-1: 0 0 1px 0 rgba(0, 0, 0, 0.5), 0 0.5px 5px 0 rgba(0, 0, 0, 0.4);
+  --dark-shadow-layer-1-hover: 0 0 1px 0 rgba(0, 0, 0, 0.5), 0 4px 8px 0 rgba(0, 0, 0, 0.55);
+  --dark-shadow-layer-2: 0 0 1px 0 rgba(0, 0, 0, 0.6), 0 0 1px 0 rgba(0, 0, 0, 0.4), 0 7px 22px 0 rgba(0, 0, 0, 0.6);
+  --dark-shadow-layer-3: 0 0 2px 0 rgba(0, 0, 0, 0.6), 0 38px 90px 0 rgba(0, 0, 0, 0.7);
+  --shadow-layer-1: var(--dark-shadow-layer-1);
+  --shadow-layer-1-hover: var(--dark-shadow-layer-1-hover);
+  --shadow-layer-2: var(--dark-shadow-layer-2);
+  --shadow-layer-3: var(--dark-shadow-layer-3);
+}
+
+/* ============================ 兜底：写死的底色 ============================ */
+html[data-lc-night="on"] body {
+  background-color: var(--lcn-bg) !important;
+  color: var(--lcn-text-1);
+}
+
+html[data-lc-night="on"] .bg-layer-1,
+html[data-lc-night="on"] .bg-layer-2,
+html[data-lc-night="on"] .bg-layer-3,
+html[data-lc-night="on"] .bg-layer-01,
+html[data-lc-night="on"] .bg-layer-bg-pure,
+html[data-lc-night="on"] .bg-sd-card {
+  background-color: var(--lcn-surface-2) !important;
+}
+
+html[data-lc-night="on"] .bg-layer-bg-gray,
+html[data-lc-night="on"] .bg-sd-background,
+html[data-lc-night="on"] .bg-sd-background-gray {
+  background-color: var(--lcn-bg) !important;
+}
+
+/* 表单控件 */
+html[data-lc-night="on"] input:not([type='checkbox']):not([type='radio']),
+html[data-lc-night="on"] textarea,
+html[data-lc-night="on"] select {
+  background-color: var(--lcn-surface-3) !important;
+  color: var(--lcn-text-1) !important;
+  border-color: var(--lcn-line-strong) !important;
+}
+
+/* 站点早期命名空间：bg-paper / bg-lc-layer-01 等写死成 rgb(255 255 255)，
+   只能按类名收口（抽屉、题库侧边栏、工具按钮都用这套） */
+html[data-lc-night="on"] .bg-paper,
+html[data-lc-night="on"] .bg-lc-layer-01,
+html[data-lc-night="on"] .bg-lc-layer-02,
+html[data-lc-night="on"] .bg-lc-fill-01,
+html[data-lc-night="on"] .bg-lc-background-index,
+html[data-lc-night="on"] [class*='bg-lc-layer-'],
+html[data-lc-night="on"] [class*='bg-lc-background'] {
+  background-color: var(--lcn-surface-2) !important;
+}
+
+html[data-lc-night="on"] [class*='dark:bg-dark-lc-background-index'],
+html[data-lc-night="on"] [class*='bg-dark-lc-background-index'] {
+  background-color: var(--lcn-bg) !important;
+}
+
+/* 工具栏小按钮（题号切换、设置等） */
+html[data-lc-night="on"] [class*='dark:bg-dark-gray-5'][class*='bg-paper'],
+html[data-lc-night="on"] [class*='dark:bg-dark-fill-3'][class*='bg-fill'] {
+  background-color: var(--lcn-surface-3) !important;
+}
+
+html[data-lc-night="on"] input::placeholder,
+html[data-lc-night="on"] textarea::placeholder {
+  color: #8b7d70 !important;
+}
+
+/* 题面里的代码块 / 表格 / 引用 */
+html[data-lc-night="on"] pre,
+html[data-lc-night="on"] pre code {
+  background-color: var(--lcn-surface-1) !important;
+  color: #ddd0c0 !important;
+}
+
+html[data-lc-night="on"] table th {
+  background-color: var(--lcn-surface-3) !important;
+  color: #e2d5c4 !important;
+}
+
+html[data-lc-night="on"] table td {
+  border-color: var(--lcn-line) !important;
+}
+
+html[data-lc-night="on"] blockquote {
+  background-color: var(--lcn-surface-2) !important;
+  border-left-color: #514640 !important;
+  color: #c9bba9 !important;
+}
+
+/* ============================ 强调色降饱和 ================================ */
+/* 站点把部分语义色写成 rgb 固值，只能按类名收口 */
+html[data-lc-night="on"] [class*='text-blue-s'],
+html[data-lc-night="on"] [class*='text-dark-blue-s'] {
+  color: #8fb3dd !important;
+}
+
+html[data-lc-night="on"] [class*='bg-blue-0'],
+html[data-lc-night="on"] [class*='bg-dark-blue-0'] {
+  background-color: rgba(233, 169, 79, 0.1) !important;
+}
+
+html[data-lc-night="on"] [class*='bg-green-s'],
+html[data-lc-night="on"] [class*='bg-dark-green-s'] {
+  background-color: #4f7a58 !important;
+  color: #f3f7f2 !important;
+}
+
+/* ============================ Monaco 代码编辑器 =========================== */
+/* 站点把它锁死在浅色 vs 主题，令牌色硬编码在 .mtk*，只能强制改写 */
+html[data-lc-night="on"] .monaco-editor,
+html[data-lc-night="on"] .monaco-editor .monaco-editor-background,
+html[data-lc-night="on"] .monaco-editor .margin,
+html[data-lc-night="on"] .monaco-editor .scroll-decoration,
+html[data-lc-night="on"] .monaco-editor .lines-content,
+html[data-lc-night="on"] .monaco-editor .view-overlays,
+html[data-lc-night="on"] .monaco-editor .overflow-guard,
+html[data-lc-night="on"] .monaco-editor .decorationsOverviewRuler {
+  background-color: var(--lcn-surface-1) !important;
+}
+
+html[data-lc-night="on"] .monaco-editor .line-numbers {
+  color: #6b5f55 !important;
+}
+
+html[data-lc-night="on"] .monaco-editor .line-numbers.active-line-number {
+  color: #d9c9b7 !important;
+}
+
+html[data-lc-night="on"] .monaco-editor .current-line {
+  border-color: rgba(255, 226, 190, 0.07) !important;
+  background-color: rgba(255, 226, 190, 0.035) !important;
+}
+
+html[data-lc-night="on"] .monaco-editor .selected-text {
+  background-color: rgba(233, 169, 79, 0.22) !important;
+}
+
+html[data-lc-night="on"] .monaco-editor .cursors-layer .cursor {
+  background-color: var(--lcn-amber) !important;
+  border-color: var(--lcn-amber) !important;
+}
+
+html[data-lc-night="on"] .monaco-editor .bracket-match {
+  background-color: rgba(233, 169, 79, 0.16) !important;
+  border-color: var(--lcn-amber-dim) !important;
+}
+
+html[data-lc-night="on"] .monaco-editor .indent-guide {
+  border-left-color: rgba(255, 226, 190, 0.09) !important;
+}
+
+html[data-lc-night="on"] .monaco-editor .suggest-widget,
+html[data-lc-night="on"] .monaco-editor .monaco-hover,
+html[data-lc-night="on"] .monaco-editor .parameter-hints-widget {
+  background-color: var(--lcn-surface-3) !important;
+  border-color: var(--lcn-surface-4) !important;
+  color: #e2d5c4 !important;
+}
+
+/* ---- 语义令牌：原 32 色逐一映射到暖色系 ---- */
+html[data-lc-night="on"] .monaco-editor .mtk1 { color: #ded1c1 !important; }
+html[data-lc-night="on"] .monaco-editor .mtk2 { color: var(--lcn-surface-1) !important; }
+html[data-lc-night="on"] .monaco-editor .mtk3 { color: #8fb87a !important; }
+html[data-lc-night="on"] .monaco-editor .mtk4 { color: #7fa8d6 !important; }
+html[data-lc-night="on"] .monaco-editor .mtk5 { color: #c98fa8 !important; }
+html[data-lc-night="on"] .monaco-editor .mtk6 { color: #d9776a !important; }
+html[data-lc-night="on"] .monaco-editor .mtk7 { color: #8ab89b !important; }
+html[data-lc-night="on"] .monaco-editor .mtk8 { color: #8fadd6 !important; }
+html[data-lc-night="on"] .monaco-editor .mtk9 { color: #6fb3ab !important; }
+html[data-lc-night="on"] .monaco-editor .mtk10 { color: #d8b07a !important; }
+html[data-lc-night="on"] .monaco-editor .mtk11 { color: #c79bdd !important; }
+html[data-lc-night="on"] .monaco-editor .mtk12 { color: #c69090 !important; }
+html[data-lc-night="on"] .monaco-editor .mtk13 { color: #a8b8e0 !important; }
+html[data-lc-night="on"] .monaco-editor .mtk14 { color: #e07a6c !important; }
+html[data-lc-night="on"] .monaco-editor .mtk15 { color: #e08a7c !important; }
+html[data-lc-night="on"] .monaco-editor .mtk16 { color: #dd9689 !important; }
+html[data-lc-night="on"] .monaco-editor .mtk17 { color: #9aa6d8 !important; }
+html[data-lc-night="on"] .monaco-editor .mtk18 { color: #cf8a7a !important; }
+html[data-lc-night="on"] .monaco-editor .mtk19 { color: #79aede !important; }
+html[data-lc-night="on"] .monaco-editor .mtk20 { color: #96897c !important; }
+html[data-lc-night="on"] .monaco-editor .mtk21 { color: #d4735f !important; }
+html[data-lc-night="on"] .monaco-editor .mtk22 { color: #b3a495 !important; }
+html[data-lc-night="on"] .monaco-editor .mtk23 { color: #cd9a6a !important; }
+html[data-lc-night="on"] .monaco-editor .mtk24 { color: #d97d67 !important; }
+html[data-lc-night="on"] .monaco-editor .mtk25 { color: #97a3d4 !important; }
+html[data-lc-night="on"] .monaco-editor .mtk26 { color: #9a8d80 !important; }
+html[data-lc-night="on"] .monaco-editor .mtk27 { color: #8f9bae !important; }
+html[data-lc-night="on"] .monaco-editor .mtk28 { color: #cb95cb !important; }
+html[data-lc-night="on"] .monaco-editor .mtk29 { color: #8ba3c9 !important; }
+html[data-lc-night="on"] .monaco-editor .mtk30 { color: #6facac !important; }
+html[data-lc-night="on"] .monaco-editor .mtk31 { color: #93a2dd !important; }
+html[data-lc-night="on"] .monaco-editor .mtk32 { color: #8f9fd4 !important; }
+
+/* ============================ CodeMirror（笔记 / Markdown） ================ */
+html[data-lc-night="on"] .cm-editor,
+html[data-lc-night="on"] .cm-scroller,
+html[data-lc-night="on"] .cm-gutters,
+html[data-lc-night="on"] .cm-panels,
+html[data-lc-night="on"] .cm-activeLine,
+html[data-lc-night="on"] .cm-activeLineGutter {
+  background-color: var(--lcn-surface-1) !important;
+  color: #ded1c1 !important;
+}
+
+html[data-lc-night="on"] .cm-gutters {
+  border-right-color: rgba(255, 226, 190, 0.08) !important;
+  color: #6b5f55 !important;
+}
+
+html[data-lc-night="on"] .cm-content,
+html[data-lc-night="on"] .cm-line {
+  color: #ded1c1 !important;
+  caret-color: var(--lcn-amber) !important;
+}
+
+html[data-lc-night="on"] .cm-cursor {
+  border-left-color: var(--lcn-amber) !important;
+}
+
+html[data-lc-night="on"] .cm-selectionBackground,
+html[data-lc-night="on"] .cm-content ::selection {
+  background-color: rgba(233, 169, 79, 0.25) !important;
+}
+
+/* ============================ 滚动条 ==================================== */
+html[data-lc-night="on"] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+html[data-lc-night="on"] ::-webkit-scrollbar-track {
+  background: #171310;
+}
+
+html[data-lc-night="on"] ::-webkit-scrollbar-thumb {
+  background: #3a332d;
+  border-radius: 6px;
+}
+
+html[data-lc-night="on"] ::-webkit-scrollbar-thumb:hover {
+  background: #4d443c;
+}
+
+/* ==================== 文字色兜底（关键：避免深灰压暖黑） ================== */
+/* 站点有一批 .text-label-1~4 是硬编码的浅色主题深灰（rgb(38,38,38) 等），
+   部分元素只带 text-label-* 而没有 dark:text-dark-label-* 对应变体，
+   在暖黑底上几乎不可读。这里统一改成暖浅色。                        */
+html[data-lc-night='on'] .text-label-1,
+html[data-lc-night='on'] [class~='text-label-1'] {
+  color: #ede4d8 !important;
+}
+
+html[data-lc-night='on'] .text-label-2,
+html[data-lc-night='on'] [class~='text-label-2'] {
+  color: rgba(243, 232, 218, 0.82) !important;
+}
+
+html[data-lc-night='on'] .text-label-3,
+html[data-lc-night='on'] [class~='text-label-3'] {
+  color: rgba(240, 228, 212, 0.66) !important;
+}
+
+html[data-lc-night='on'] .text-label-4,
+html[data-lc-night='on'] [class~='text-label-4'] {
+  color: rgba(236, 224, 206, 0.48) !important;
+}
+
+/* sd 设计系统的文字色 */
+html[data-lc-night='on'] .text-sd-foreground {
+  color: hsl(var(--sd-foreground)) !important;
+}
+
+html[data-lc-night='on'] .text-sd-muted-foreground {
+  color: hsl(var(--sd-muted-foreground)) !important;
+}
+
+/* ==================== 题面代码块语法高亮（Prism） ========================
+   Prism 把颜色写成行内 style="color: rgb(...)"，只能靠 !important 强压。
+   原始配色是浅色主题的（青色/深洋红压在暖黑上对比度仅 2~3.6），
+   这里按语法角色重映射到一组暖色高亮。                                */
+html[data-lc-night='on'] pre code,
+html[data-lc-night='on'] code[class*='language-'] {
+  color: #ddd0c0 !important;
+  text-shadow: none !important;
+  background: none !important;
+}
+
+/* 关键字 / 控制流 / 运算符（原青色 rgb(0,119,170)） */
+html[data-lc-night='on'] pre code .token.keyword,
+html[data-lc-night='on'] pre code .token.control-flow,
+html[data-lc-night='on'] pre code .token.boolean,
+html[data-lc-night='on'] pre code .token.operator,
+html[data-lc-night='on'] pre code .token.atrule,
+html[data-lc-night='on'] pre code .token.rule {
+  color: #7fb3d5 !important;
+}
+
+/* 数字 / 常量 / 字符串里的数值（原深洋红 rgb(153,0,85)） */
+html[data-lc-night='on'] pre code .token.number,
+html[data-lc-night='on'] pre code .token.constant,
+html[data-lc-night='on'] pre code .token.symbol {
+  color: #d9a0b5 !important;
+}
+
+/* 函数名 / 类名 / 方法（原亮玫红 rgb(221,74,104)） */
+html[data-lc-night='on'] pre code .token.function,
+html[data-lc-night='on'] pre code .token.function-definition,
+html[data-lc-night='on'] pre code .token.function-variable,
+html[data-lc-night='on'] pre code .token.known-class-name,
+html[data-lc-night='on'] pre code .token.class-name,
+html[data-lc-night='on'] pre code .token.method,
+html[data-lc-night='on'] pre code .token.builtin {
+  color: #e0a878 !important;
+}
+
+/* 字符串 */
+html[data-lc-night='on'] pre code .token.string,
+html[data-lc-night='on'] pre code .token.char,
+html[data-lc-night='on'] pre code .token.template-string {
+  color: #a8c48f !important;
+}
+
+/* 注释（原冷灰 rgb(112,128,144)） */
+html[data-lc-night='on'] pre code .token.comment,
+html[data-lc-night='on'] pre code .token.prolog,
+html[data-lc-night='on'] pre code .token.doctype,
+html[data-lc-night='on'] pre code .token.cdata {
+  color: #9a8c7c !important;
+}
+
+/* 变量 / 参数 / 属性访问（原半透明深灰，几乎不可见） */
+html[data-lc-night='on'] pre code .token.parameter,
+html[data-lc-night='on'] pre code .token.property-access,
+html[data-lc-night='on'] pre code .token.variable,
+html[data-lc-night='on'] pre code .token.property,
+html[data-lc-night='on'] pre code .token.plain-text {
+  color: #d8cbbc !important;
+}
+
+/* 标点 / 括号（原浅灰 rgb(153,153,153)） */
+html[data-lc-night='on'] pre code .token.punctuation,
+html[data-lc-night='on'] pre code .token.bracket {
+  color: #9d9083 !important;
+}
+
+/* 兜底：任何仍写成深色的 token 一律提亮 */
+html[data-lc-night='on'] pre code .token[style*='rgb(38, 38, 38)'] {
+  color: #d8cbbc !important;
+}
+
+/* ---- 兜底：Prism 的 token class 常为空，真正颜色写在行内样式里 ----
+   用属性选择器精确命中原始那几组颜色，逐个提亮。
+   这比依赖 .token.xxx 更可靠，因为站点的 token 往往没有语义 class。 */
+html[data-lc-night='on'] pre code span.token[style*='rgb(0, 119, 170)'] {
+  color: #7fb3d5 !important; /* 关键字：青 → 雾蓝 */
+}
+
+html[data-lc-night='on'] pre code span.token[style*='rgb(153, 0, 85)'] {
+  color: #d9a0b5 !important; /* 数字：深洋红 → 灰粉 */
+}
+
+html[data-lc-night='on'] pre code span.token[style*='rgb(221, 74, 104)'] {
+  color: #e0a878 !important; /* 函数/类名：玫红 → 暖橙 */
+}
+
+html[data-lc-night='on'] pre code span.token[style*='rgb(166, 38, 164)'] {
+  color: #c9a0d8 !important; /* 关键字变体 → 灰紫 */
+}
+
+html[data-lc-night='on'] pre code span.token[style*='rgb(154, 110, 58)'] {
+  color: #c9a882 !important; /* 运算符：棕 → 暖沙 */
+}
+
+html[data-lc-night='on'] pre code span.token[style*='rgb(112, 128, 144)'] {
+  color: #9a8c7c !important; /* 注释：冷灰蓝 → 暖灰 */
+}
+
+/* 注释实际写的是颜色名 slategray（不是 rgb()），需要单独命中 */
+html[data-lc-night='on'] pre code span.token[style*='slategray'] {
+  color: #9a8c7c !important;
+}
+
+html[data-lc-night='on'] pre code span.token[style*='rgb(153, 153, 153)'] {
+  color: #9d9083 !important; /* 标点：中灰 → 暖灰 */
+}
+
+html[data-lc-night='on'] pre code span.token[style*='rgb(153, 153, 153)'] {
+  color: #9d9083 !important;
+}
+
+html[data-lc-night='on'] pre code span.token[style*='rgb(0, 0, 0)'] {
+  color: #ded1c1 !important; /* 纯黑 → 暖白 */
+}
+
+html[data-lc-night='on'] pre code span.token[style*='rgb(255, 0, 0)'],
+html[data-lc-night='on'] pre code span.token[style*='rgb(238, 0, 0)'] {
+  color: #d9776a !important;
+}
+
+html[data-lc-night='on'] pre code span.token[style*='rgb(0, 128, 0)'] {
+  color: #8fb87a !important;
+}
+
+html[data-lc-night='on'] pre code span.token[style*='rgb(0, 0, 255)'] {
+  color: #7fa8d6 !important;
+}
+
+/* ============================ 护眼遮罩 ================================== */
+#lc-night-veils {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+}
+
+#lc-night-veils > div {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#lc-night-veil-warm {
+  background-color: #ff9a3c;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+#lc-night-veil-dim {
+  background-color: #000;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+@media print {
+  #lc-night-veils {
+    display: none !important;
+  }
+}
