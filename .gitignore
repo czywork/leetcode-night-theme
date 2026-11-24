@@ -15,4 +15,4 @@ desktop.ini
 *.swp
 
 # 临时
-*.log
+*.logpush-to-github.bat
