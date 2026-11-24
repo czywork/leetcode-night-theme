@@ -651,10 +651,6 @@ html[data-lc-night='on'] pre code span.token[style*='rgb(153, 153, 153)'] {
   color: #9d9083 !important; /* 标点：中灰 → 暖灰 */
 }
 
-html[data-lc-night='on'] pre code span.token[style*='rgb(153, 153, 153)'] {
-  color: #9d9083 !important;
-}
-
 html[data-lc-night='on'] pre code span.token[style*='rgb(0, 0, 0)'] {
   color: #ded1c1 !important; /* 纯黑 → 暖白 */
 }

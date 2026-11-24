@@ -22,6 +22,10 @@ const shell = fs.readFileSync(jsPath, 'utf8');
 const css = fs.readFileSync(cssPath, 'utf8');
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
+// 剥掉模板顶部的构建说明注释——它只对维护者有意义，
+// 留在产物里会误导用户以为"不能安装这个文件"
+const shellBody = shell.replace(/^\/\*[\s\S]*?\*\/\s*/, '');
+
 // 内联进模板字符串前必须确认 CSS 里没有反引号和 ${}
 if (css.includes('`')) throw new Error('theme.css 含反引号，无法安全内联');
 if (css.includes('${')) throw new Error('theme.css 含 ${}，无法安全内联');
@@ -29,10 +33,10 @@ if (css.includes('${')) throw new Error('theme.css 含 ${}，无法安全内联'
 // 用唯一占位符替换，避免误伤注释里出现的同名文字
 const PLACEHOLDER = '@@LCN_THEME_CSS@@';
 
-if (!shell.includes(PLACEHOLDER)) {
+if (!shellBody.includes(PLACEHOLDER)) {
   throw new Error(`shell.js 缺少占位符 ${PLACEHOLDER}`);
 }
-if (shell.split(PLACEHOLDER).length !== 2) {
+if (shellBody.split(PLACEHOLDER).length !== 2) {
   throw new Error('shell.js 中占位符出现次数不为 1，会导致注入位置错误');
 }
 
@@ -62,7 +66,7 @@ const header = `// ==UserScript==
 
 `;
 
-const body = shell.replace(PLACEHOLDER, () => css);
+const body = shellBody.replace(PLACEHOLDER, () => css);
 fs.writeFileSync(outPath, header + body, 'utf8');
 
 const kb = (Buffer.byteLength(header + body, 'utf8') / 1024).toFixed(1);

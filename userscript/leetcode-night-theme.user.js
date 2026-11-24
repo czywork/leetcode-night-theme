@@ -20,11 +20,6 @@
 // @license      MIT
 // ==/UserScript==
 
-/* 深夜护眼 · 力扣夜间主题 — 油猴脚本外壳
-   ----------------------------------------------------------------------------
-   本文件是模板，构建时会把 src/theme.css 的内容注入到下方 CSS 常量的占位处，
-   生成最终可安装的 userscript。请勿直接安装本文件。
-   ============================================================================ */
 (function () {
   'use strict';
 
@@ -680,10 +675,6 @@ html[data-lc-night='on'] pre code span.token[style*='slategray'] {
 
 html[data-lc-night='on'] pre code span.token[style*='rgb(153, 153, 153)'] {
   color: #9d9083 !important; /* 标点：中灰 → 暖灰 */
-}
-
-html[data-lc-night='on'] pre code span.token[style*='rgb(153, 153, 153)'] {
-  color: #9d9083 !important;
 }
 
 html[data-lc-night='on'] pre code span.token[style*='rgb(0, 0, 0)'] {
