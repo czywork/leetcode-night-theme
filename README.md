@@ -22,6 +22,21 @@
 
 ## 安装
 
+两种方式，效果完全一样，任选其一。
+
+### 方式一：油猴脚本（推荐，最省事）
+
+1. 先装一个用户脚本管理器：[Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)
+2. 点这里安装脚本 👉 [`leetcode-night-theme.user.js`](./userscript/leetcode-night-theme.user.js)
+3. 脚本管理器会弹出安装页，点 **安装** 即可
+4. 打开任意力扣页面，主题自动生效
+
+好处是**支持自动更新**，以后改版不用手动换文件。
+
+> Greasy Fork 上也能装（若已上架），搜索「力扣 深夜护眼」。
+
+### 方式二：浏览器扩展
+
 扩展没有上架商店，本地加载即可（Edge 和 Chrome 步骤一样）：
 
 1. 下载本仓库（`Code` → `Download ZIP`，或 `git clone`）
@@ -36,7 +51,10 @@
 
 ## 使用
 
-点浏览器工具栏的月亮图标打开面板：
+**扩展版**：点浏览器工具栏的月亮图标。
+**油猴版**：点页面右下角的月亮悬浮按钮，或从脚本管理器的菜单里打开。
+
+面板里可以：
 
 - **总开关** —— 一键开 / 关
 - **暖色强度**（0–100）—— 叠一层暖光，越低越接近原生冷色，越高越黄
@@ -92,14 +110,29 @@ html[data-lc-night='on'] {
 leetcode-night-theme/
 ├── manifest.json        # MV3 清单
 ├── icons/               # 16/32/48/128 图标
-└── src/
-    ├── theme.css        # 主题本体（变量映射 + 兜底 + 代码高亮）
-    ├── content.js       # 挂载/守护、遮罩、快捷键、设置同步
-    ├── popup.html       # 设置面板
-    ├── popup.css
-    ├── popup.js
-    └── background.js    # 快捷键命令、安装初始化
+├── src/                 # 扩展本体
+│   ├── theme.css        # ★ 主题唯一来源（变量映射 + 兜底 + 代码高亮）
+│   ├── content.js       # 挂载/守护、遮罩、快捷键、设置同步
+│   ├── popup.html       # 设置面板
+│   ├── popup.css
+│   ├── popup.js
+│   └── background.js    # 快捷键命令、安装初始化
+└── userscript/          # 油猴脚本
+    ├── shell.js         # 外壳模板（控制逻辑 + 设置面板）
+    ├── build.mjs        # 构建：把 theme.css 注入模板
+    └── leetcode-night-theme.user.js   # ★ 生成的可安装文件
 ```
+
+主题样式只有 `src/theme.css` 一份，扩展和油猴脚本共用。改完样式后执行：
+
+```bash
+node userscript/build.mjs
+```
+
+就会重新生成油猴脚本，两边的配色永远一致，不会走样。
+
+> 注意：别直接改 `userscript/leetcode-night-theme.user.js`，它是构建产物，下次构建会被覆盖。
+> 要改控制逻辑请改 `userscript/shell.js`。
 
 ---
 
