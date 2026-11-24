@@ -26,14 +26,15 @@
 
 ### 方式一：油猴脚本（推荐，最省事）
 
-1. 先装一个用户脚本管理器：[Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)
-2. 点这里安装脚本 👉 [`leetcode-night-theme.user.js`](./userscript/leetcode-night-theme.user.js)
-3. 脚本管理器会弹出安装页，点 **安装** 即可
+1. 装用户脚本管理器：[Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)
+2. **新版篡改猴（MV3）需要手动允许用户脚本**：打开 `edge://extensions/` → 篡改猴「详细信息」→ 打开「允许用户脚本」
+3. 安装脚本，两种办法任选：
+   - 下载 [`userscript/leetcode-night-theme.user.js`](./userscript/leetcode-night-theme.user.js)，拖进篡改猴的管理面板
+   - 或在篡改猴管理面板 →「实用工具」→ 导入该文件
 4. 打开任意力扣页面，主题自动生效
 
-好处是**支持自动更新**，以后改版不用手动换文件。
-
-> Greasy Fork 上也能装（若已上架），搜索「力扣 深夜护眼」。
+> ⚠️ `raw.githubusercontent.com` 在国内经常不可达，所以脚本**没有配置 `@updateURL` 自动更新**（否则会反复更新失败弹错）。
+> 需要更新时，重新下载本文件导入即可覆盖旧版，设置不会丢。
 
 ### 方式二：浏览器扩展
 
