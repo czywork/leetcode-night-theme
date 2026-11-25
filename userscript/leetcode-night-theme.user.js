@@ -2,7 +2,7 @@
 // @name         深夜护眼 · 力扣夜间主题
 // @name:en      LeetCode Night Eye-Care Theme
 // @namespace    https://github.com/czywork/leetcode-night-theme
-// @version      1.1.0
+// @version      1.1.1
 // @description  给力扣加上暖色深夜护眼主题：低蓝光、柔和不刺眼，代码高亮同步换色
 // @description:en  Warm, low-blue-light night theme for LeetCode China with recolored code highlighting
 // @author       czywork
@@ -660,18 +660,13 @@ html[data-lc-night='on'] .monaco-editor {
 }
 
 /* Monaco 的 .monaco-editor-background 用 var(--vscode-editor-background)，
-   而其自身 class 选择器特指度高于继承，必须直接点名这个元素 */
-html[data-lc-night='on'] .monaco-editor .monaco-editor-background,
-html[data-lc-night='on'] .monaco-editor .lines-content.monaco-editor-background,
-html[data-lc-night='on'] .monaco-editor .view-lines.monaco-mouse-cursor-text {
-  background-color: var(--lcn-surface-1) !important;
-}
+   而其自身 class 选择器特指度高于继承，必须直接点名这个元素。
 
-/* Monaco 的 .monaco-editor-background 用 var(--vscode-editor-background)，
-   而其自身 class 选择器特指度高于继承，必须直接点名这个元素 */
+   ⚠️ 只点名 .lines-content（叠加层与文字层的共同父级），绝不能给 .view-lines 上背景：
+   Monaco 的 DOM 顺序是 .view-overlays（选区/高亮层）在前、.view-lines（文字层）在后，
+   给 .view-lines 加不透明背景会把选区、双击词高亮整片盖死（v1.1.0 的选中bug就出在这）。 */
 html[data-lc-night='on'] .monaco-editor .monaco-editor-background,
-html[data-lc-night='on'] .monaco-editor .lines-content.monaco-editor-background,
-html[data-lc-night='on'] .monaco-editor .view-lines.monaco-mouse-cursor-text {
+html[data-lc-night='on'] .monaco-editor .lines-content.monaco-editor-background {
   background-color: var(--lcn-surface-1) !important;
 }
 

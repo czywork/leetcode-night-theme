@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "深夜护眼 · 力扣夜间主题",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "给力扣（leetcode.cn）加上暖色深夜护眼主题：低蓝光、柔和不刺眼，代码高亮同步换色。",
   "minimum_chrome_version": "110",
   "icons": {
