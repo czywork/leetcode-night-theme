@@ -1,7 +1,7 @@
 /* 深夜护眼 — 弹窗逻辑 */
 'use strict';
 
-const DEFAULTS = { enabled: true, warm: 12, dim: 0 };
+const DEFAULTS = { enabled: true, warm: 12, dim: 0, theme: 'amber' };
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -40,6 +40,11 @@ function render(state) {
   const off = !state.enabled;
   els.rowWarm.classList.toggle('disabled', off);
   els.rowDim.classList.toggle('disabled', off);
+
+  // 主题高亮
+  document.querySelectorAll('.theme-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.theme === (state.theme || 'amber'));
+  });
 
   // 预设高亮
   document.querySelectorAll('.preset').forEach((btn) => {
@@ -96,6 +101,16 @@ async function pushToTab(state) {
       state.enabled = true;
       render(state);
       await chrome.storage.local.set({ warm: state.warm, dim: state.dim, enabled: true });
+      pushToTab(state);
+    });
+  });
+
+  document.querySelectorAll('.theme-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      state.theme = btn.dataset.theme;
+      state.enabled = true;
+      render(state);
+      await chrome.storage.local.set({ theme: state.theme, enabled: true });
       pushToTab(state);
     });
   });

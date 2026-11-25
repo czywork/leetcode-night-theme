@@ -300,3 +300,73 @@ kbd {
   color: var(--text-3);
   opacity: 0.5;
 }
+
+/* ---------- 主题选择器 ---------- */
+.themes-sec {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.sec-label {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.themes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.theme-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 2px 6px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  font-family: inherit;
+}
+
+.theme-btn:hover {
+  background: var(--panel-2);
+  border-color: rgba(255, 226, 190, 0.22);
+}
+
+.theme-btn.active {
+  border-color: var(--amber);
+  background: var(--amber-soft);
+}
+
+.sw-dots {
+  display: flex;
+  gap: 2px;
+}
+
+.sw-dots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  display: block;
+}
+
+.theme-nm {
+  font-size: 10px;
+  color: var(--text-2);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.theme-btn.active .theme-nm {
+  color: var(--amber);
+}
+
+.dot-sep {
+  margin: 0 2px;
+  opacity: 0.5;
+}

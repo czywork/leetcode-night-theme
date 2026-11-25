@@ -22,7 +22,7 @@
   window.__lcNightBooted = true;
 
   const ROOT = document.documentElement;
-  const DEFAULTS = { enabled: true, warm: 12, dim: 0 };
+  const DEFAULTS = { enabled: true, warm: 12, dim: 0, theme: 'amber' };
   const ATTR = 'data-lc-night';
 
   let state = { ...DEFAULTS };
@@ -97,6 +97,7 @@
   function mount() {
     rememberOriginal();
     ROOT.setAttribute(ATTR, 'on');
+    ROOT.setAttribute('data-lcn-theme', state.theme || 'amber');
     // dark 类供 Tailwind dark: 变体使用；light 与之冲突，优先摘掉
     if (ROOT.classList.contains('light')) ROOT.classList.remove('light');
     if (!ROOT.classList.contains('dark')) ROOT.classList.add('dark');
@@ -105,6 +106,7 @@
 
   function unmount() {
     ROOT.removeAttribute(ATTR);
+    ROOT.removeAttribute('data-lcn-theme');
     // 还原到接管前的状态，避免留下站点的冷灰暗色
     if (originalClass !== null) {
       ROOT.className = originalClass;
@@ -173,6 +175,7 @@
         enabled: patch.enabled === undefined ? state.enabled : !!patch.enabled,
         warm: clamp(patch.warm === undefined ? state.warm : Number(patch.warm), 0, 100),
         dim: clamp(patch.dim === undefined ? state.dim : Number(patch.dim), 0, 60),
+        theme: patch.theme === undefined ? state.theme : String(patch.theme),
       };
       render();
       if (state.enabled) startGuard();

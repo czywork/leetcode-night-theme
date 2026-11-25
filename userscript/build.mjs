@@ -15,11 +15,13 @@ const root = path.resolve(here, '..');
 
 const jsPath = path.join(root, 'userscript', 'shell.js');
 const cssPath = path.join(root, 'src', 'theme.css');
+const themesPath = path.join(root, 'src', 'themes.css');
 const outPath = path.join(root, 'userscript', 'leetcode-night-theme.user.js');
 const manifestPath = path.join(root, 'manifest.json');
 
 const shell = fs.readFileSync(jsPath, 'utf8');
-const css = fs.readFileSync(cssPath, 'utf8');
+// 调色板在前、结构层在后，保证 CSS 层叠顺序正确
+const css = [fs.readFileSync(themesPath, 'utf8'), fs.readFileSync(cssPath, 'utf8')].join('\n\n');
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
 // 剥掉模板顶部的构建说明注释——它只对维护者有意义，

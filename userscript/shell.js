@@ -13,7 +13,15 @@
   // 不能在脚本顶层缓存 documentElement：@run-at document-start 时它可能还没生成
   const getRoot = () => document.documentElement;
   const ATTR = 'data-lc-night';
-  const DEFAULTS = { enabled: true, warm: 12, dim: 0, btn: true };
+  const DEFAULTS = { enabled: true, warm: 12, dim: 0, btn: true, theme: 'amber' };
+
+  // 可选配色主题（与 themes.css 中的 data-lcn-theme 值一一对应）
+  const THEMES = {
+    amber: '暖夜琥珀',
+    green: '护眼墨绿',
+    solarized: 'Solarized',
+    gruvbox: 'Gruvbox',
+  };
 
   const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
@@ -47,6 +55,7 @@
     warm: clamp(Number(store.get('warm', DEFAULTS.warm)) || 0, 0, 100),
     dim: clamp(Number(store.get('dim', DEFAULTS.dim)) || 0, 0, 60),
     btn: store.get('btn', DEFAULTS.btn),
+    theme: store.get('theme', DEFAULTS.theme),
   };
 
   function persist() {
@@ -54,6 +63,7 @@
     store.set('warm', state.warm);
     store.set('dim', state.dim);
     store.set('btn', state.btn);
+    store.set('theme', state.theme);
   }
 
   /* ------------------------------------------------------------- 样式注入 */
@@ -155,6 +165,7 @@
     const root = getRoot();
     if (!root) return;
     root.setAttribute(ATTR, 'on');
+    root.setAttribute('data-lcn-theme', state.theme || 'amber');
     // dark 类供站点 Tailwind 的 dark: 变体生效，否则文字仍是浅色主题的深灰
     if (root.classList.contains('light')) root.classList.remove('light');
     if (!root.classList.contains('dark')) root.classList.add('dark');
@@ -165,6 +176,7 @@
     const root = getRoot();
     if (root) {
       root.removeAttribute(ATTR);
+      root.removeAttribute('data-lcn-theme');
       if (originalClass !== null) {
         root.className = originalClass;
         originalClass = null;
@@ -268,6 +280,20 @@
     kbd { display:inline-block;min-width:16px;padding:1px 4px;font-size:9.5px;font-family:ui-monospace,monospace;color:#a89a8b;background:#2b2521;border:1px solid rgba(255,226,190,.1);border-bottom-width:2px;border-radius:3px; }
     .toggle-bar { display:flex;align-items:center;justify-content:space-between;padding-bottom:2px; }
     .toggle-lbl { font-size:12.5px;color:#a89a8b; }
+    .themes { display:grid;grid-template-columns:repeat(4,1fr);gap:6px; }
+    .theme-btn {
+      display:flex;flex-direction:column;align-items:center;gap:4px;
+      padding:6px 2px 5px;border-radius:8px;cursor:pointer;
+      background:#221d19;border:1px solid rgba(255,226,190,.1);
+      transition:all .16s;
+    }
+    .theme-btn:hover { background:#2b2521;border-color:rgba(255,226,190,.22); }
+    .theme-btn.on { border-color:#e9a94f;background:rgba(233,169,79,.12); }
+    .sw-dots { display:flex;gap:2px; }
+    .sw-dots i { width:9px;height:9px;border-radius:2px;display:block; }
+    .theme-nm { font-size:9.5px;color:#a89a8b;line-height:1;white-space:nowrap; }
+    .theme-btn.on .theme-nm { color:#e9a94f; }
+    .sec-lbl { font-size:11px;color:#7d7164;letter-spacing:.02em; }
   `;
 
   const MOON_SVG =
@@ -318,6 +344,25 @@
           <input type="range" min="0" max="60" step="1" value="0" data-range="dim" />
           <div class="hint"><span>亮</span><span>暗</span></div>
         </div>
+        <div class="sec-lbl">配色主题</div>
+        <div class="themes">
+          <button class="theme-btn" data-theme="amber" title="暖夜琥珀">
+            <span class="sw-dots"><i style="background:#16120f"></i><i style="background:#e9a94f"></i><i style="background:#7fb3d5"></i></span>
+            <span class="theme-nm">琥珀</span>
+          </button>
+          <button class="theme-btn" data-theme="green" title="护眼墨绿">
+            <span class="sw-dots"><i style="background:#0f1613"></i><i style="background:#7fbf9a"></i><i style="background:#7db8c4"></i></span>
+            <span class="theme-nm">墨绿</span>
+          </button>
+          <button class="theme-btn" data-theme="solarized" title="Solarized 深色">
+            <span class="sw-dots"><i style="background:#002b36"></i><i style="background:#b58900"></i><i style="background:#268bd2"></i></span>
+            <span class="theme-nm">Solar</span>
+          </button>
+          <button class="theme-btn" data-theme="gruvbox" title="Gruvbox 复古">
+            <span class="sw-dots"><i style="background:#282828"></i><i style="background:#fabd2f"></i><i style="background:#fb4934"></i></span>
+            <span class="theme-nm">Gruv</span>
+          </button>
+        </div>
         <div class="presets">
           <button class="preset" data-warm="0" data-dim="0">标准夜</button>
           <button class="preset" data-warm="20" data-dim="10">柔和</button>
@@ -326,7 +371,7 @@
       </div>
       <div class="foot">
         <a href="https://github.com/czywork/leetcode-night-theme" target="_blank" rel="noopener">GitHub</a>
-        <span class="keys"><kbd>Alt</kbd><kbd>⇧</kbd><kbd>N</kbd></span>
+        <span class="keys" title="N 开关 · T 换主题"><kbd>Alt</kbd><kbd>⇧</kbd><kbd>N</kbd><span style="margin:0 3px;color:#4d443c">/</span><kbd>T</kbd></span>
       </div>
     `;
 
@@ -397,6 +442,18 @@
         syncPanel();
       });
     });
+
+    // 配色主题切换
+    wrap.querySelectorAll('.theme-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.theme = btn.dataset.theme;
+        state.enabled = true;
+        render();
+        persist();
+        startGuard();
+        syncPanel();
+      });
+    });
   }
 
   function syncPanel() {
@@ -420,6 +477,11 @@
         Number(btn.dataset.warm) === state.warm &&
         Number(btn.dataset.dim) === state.dim;
       btn.classList.toggle('on', on);
+    });
+
+    // 主题按钮高亮
+    wrap.querySelectorAll('.theme-btn').forEach((btn) => {
+      btn.classList.toggle('on', btn.dataset.theme === (state.theme || 'amber'));
     });
 
     if (fab) fab.style.display = panelOpen ? 'none' : state.btn ? 'grid' : 'none';
@@ -468,6 +530,12 @@
     } else if (e.key === 'ArrowLeft') {
       state.dim = clamp(state.dim - 5, 0, 60);
       render();
+    } else if (k === 't') {
+      // 循环切换主题
+      const list = Object.keys(THEMES);
+      const i = list.indexOf(state.theme || 'amber');
+      state.theme = list[(i + 1) % list.length];
+      render();
     } else {
       hit = false;
     }
@@ -485,6 +553,7 @@
     const root = getRoot();
     if (state.enabled && root) {
       root.setAttribute(ATTR, 'on');
+      root.setAttribute('data-lcn-theme', state.theme || 'amber');
       root.classList.add('dark');
       root.classList.remove('light');
     }
@@ -533,6 +602,14 @@
       persist();
       if (state.enabled) startGuard();
       else stopGuard();
+      syncPanel();
+    });
+    GM_registerMenuCommand('🎨 切换配色主题', () => {
+      const list = Object.keys(THEMES);
+      const i = list.indexOf(state.theme || 'amber');
+      state.theme = list[(i + 1) % list.length];
+      render();
+      persist();
       syncPanel();
     });
     GM_registerMenuCommand('🫥 隐藏悬浮按钮', () => {

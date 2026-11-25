@@ -1,0 +1,199 @@
+/* ============================================================================
+   深夜护眼 · 力扣夜间主题 — 调色板定义
+   ----------------------------------------------------------------------------
+   每套主题只定义约 30 个核心 token，其余（力扣语义变量、sd 系统、透明层、
+   Monaco 令牌）全部在 theme.css 里由这些 token 派生。
+
+   新增一套主题 = 复制一个 40 行左右的块，改颜色即可。
+   ========================================================================== */
+
+/* ==========================================================================
+   1. 暖夜琥珀（默认）—— 暖炭黑 + 象牙白 + 琥珀，蓝光最少
+   ========================================================================== */
+html[data-lc-night='on'][data-lcn-theme='amber'] {
+  /* 底色层次：从最底到最亮一档 */
+  --lcn-bg-deep: #100d0c;
+  --lcn-bg: #16120f;
+  --lcn-surface-1: #1b1714;
+  --lcn-surface-2: #221d19;
+  --lcn-surface-3: #2b2521;
+  --lcn-surface-4: #37302a;
+
+  /* 文字：四级层次 */
+  --lcn-text-1: #ede4d8;
+  --lcn-text-2: rgba(243, 232, 218, 0.8);
+  --lcn-text-3: rgba(240, 228, 212, 0.62);
+  --lcn-text-4: rgba(236, 224, 206, 0.44);
+
+  /* 强调色与描边 */
+  --lcn-accent: #e9a94f;
+  --lcn-accent-dim: #c08f4a;
+  --lcn-accent-soft: rgba(233, 169, 79, 0.16);
+  --lcn-line: rgba(255, 226, 190, 0.1);
+  --lcn-line-strong: rgba(255, 226, 190, 0.16);
+
+  /* 透明层的暖白基色 */
+  --lcn-tint-rgb: 255, 226, 190;
+
+  /* 语法高亮 */
+  --lcn-syn-fg: #ded1c1;
+  --lcn-syn-fg-dim: #d8cbbc;
+  --lcn-syn-inverse: #1b1714;
+  --lcn-syn-green: #8fb87a;
+  --lcn-syn-blue: #7fa8d6;
+  --lcn-syn-red: #d9776a;
+  --lcn-syn-orange: #e0a878;
+  --lcn-syn-cyan: #7fb3d5;
+  --lcn-syn-purple: #c79bdd;
+  --lcn-syn-magenta: #d9a0b5;
+  --lcn-syn-yellow: #d8b07a;
+  --lcn-syn-gray: #9a8c7c;
+
+  /* 语义色（难度标签 / 提示） */
+  --lcn-ok: #79ad82;
+  --lcn-warn: #d9a846;
+  --lcn-err: #cf7f72;
+  --lcn-info: #6f9fd0;
+
+  /* sd 设计系统用的色相与饱和度 */
+  --lcn-hue: 28;
+  --lcn-sat: 14%;
+}
+
+/* ==========================================================================
+   2. 护眼墨绿 —— 绿灰底，压蓝光但不让画面发绿失真
+   ========================================================================== */
+html[data-lc-night='on'][data-lcn-theme='green'] {
+  --lcn-bg-deep: #0a100d;
+  --lcn-bg: #0f1613;
+  --lcn-surface-1: #131b17;
+  --lcn-surface-2: #18211c;
+  --lcn-surface-3: #1f2a23;
+  --lcn-surface-4: #28352c;
+
+  --lcn-text-1: #d6e4da;
+  --lcn-text-2: rgba(214, 228, 218, 0.82);
+  --lcn-text-3: rgba(205, 222, 210, 0.64);
+  --lcn-text-4: rgba(196, 214, 202, 0.46);
+
+  --lcn-accent: #7fbf9a;
+  --lcn-accent-dim: #5f9578;
+  --lcn-accent-soft: rgba(127, 191, 154, 0.16);
+  --lcn-line: rgba(200, 255, 222, 0.1);
+  --lcn-line-strong: rgba(200, 255, 222, 0.16);
+
+  --lcn-tint-rgb: 200, 255, 222;
+
+  --lcn-syn-fg: #cfe0d4;
+  --lcn-syn-fg-dim: #b8ccc0;
+  --lcn-syn-inverse: #131b17;
+  --lcn-syn-green: #9ccfa6;
+  --lcn-syn-blue: #7db8c4;
+  --lcn-syn-red: #d89098;
+  --lcn-syn-orange: #d4b878;
+  --lcn-syn-cyan: #7fbfb4;
+  --lcn-syn-purple: #b8a0cf;
+  --lcn-syn-magenta: #cf9db8;
+  --lcn-syn-yellow: #cdc078;
+  --lcn-syn-gray: #6f897b;
+
+  --lcn-ok: #7fbf9a;
+  --lcn-warn: #c9b878;
+  --lcn-err: #d89098;
+  --lcn-info: #7db8c4;
+
+  --lcn-hue: 145;
+  --lcn-sat: 16%;
+}
+
+/* ==========================================================================
+   3. Solarized 深色 —— Ethan Schoonover 的经典护眼配色
+   ========================================================================== */
+html[data-lc-night='on'][data-lcn-theme='solarized'] {
+  --lcn-bg-deep: #00212b;
+  --lcn-bg: #002b36;
+  --lcn-surface-1: #00252e;
+  --lcn-surface-2: #073642;
+  --lcn-surface-3: #0d404e;
+  --lcn-surface-4: #164b5b;
+
+  --lcn-text-1: #cdd5d5;
+  --lcn-text-2: rgba(198, 205, 205, 0.92);
+  --lcn-text-3: rgba(198, 206, 207, 0.72);
+  --lcn-text-4: rgba(182, 192, 193, 0.55);
+
+  --lcn-accent: #b58900;
+  --lcn-accent-dim: #8a6800;
+  --lcn-accent-soft: rgba(181, 137, 0, 0.18);
+  --lcn-line: rgba(147, 161, 161, 0.13);
+  --lcn-line-strong: rgba(147, 161, 161, 0.22);
+
+  --lcn-tint-rgb: 147, 161, 161;
+
+  --lcn-syn-fg: #93a1a1;
+  --lcn-syn-fg-dim: #879799;
+  --lcn-syn-inverse: #002b36;
+  --lcn-syn-green: #889d00;
+  --lcn-syn-blue: #6fa8c8;
+  --lcn-syn-red: #e76f6d;
+  --lcn-syn-orange: #ea703e;
+  --lcn-syn-cyan: #2ba69d;
+  --lcn-syn-purple: #8b8fd0;
+  --lcn-syn-magenta: #df6ea5;
+  --lcn-syn-yellow: #bc8e00;
+  --lcn-syn-gray: #80989f;
+
+  --lcn-ok: #2ba39a;
+  --lcn-warn: #b88b00;
+  --lcn-err: #e66d6b;
+  --lcn-info: #3a99db;
+
+  --lcn-hue: 192;
+  --lcn-sat: 42%;
+}
+
+/* ==========================================================================
+   4. Gruvbox 复古 —— 暖调高对比，语法色区分度强，写代码很舒服
+   ========================================================================== */
+html[data-lc-night='on'][data-lcn-theme='gruvbox'] {
+  --lcn-bg-deep: #1d2021;
+  --lcn-bg: #282828;
+  --lcn-surface-1: #242220;
+  --lcn-surface-2: #3c3836;
+  --lcn-surface-3: #504945;
+  --lcn-surface-4: #665c54;
+
+  --lcn-text-1: #ebdbb2;
+  --lcn-text-2: rgba(238, 224, 188, 0.82);
+  --lcn-text-3: rgba(229, 218, 197, 0.66);
+  --lcn-text-4: rgba(211, 202, 184, 0.5);
+
+  --lcn-accent: #fabd2f;
+  --lcn-accent-dim: #d79921;
+  --lcn-accent-soft: rgba(250, 189, 47, 0.16);
+  --lcn-line: rgba(235, 219, 178, 0.12);
+  --lcn-line-strong: rgba(235, 219, 178, 0.2);
+
+  --lcn-tint-rgb: 235, 219, 178;
+
+  --lcn-syn-fg: #ebdbb2;
+  --lcn-syn-fg-dim: #d5c4a1;
+  --lcn-syn-inverse: #282828;
+  --lcn-syn-green: #b8bb26;
+  --lcn-syn-blue: #83a598;
+  --lcn-syn-red: #fc614e;
+  --lcn-syn-orange: #fe8019;
+  --lcn-syn-cyan: #8ec07c;
+  --lcn-syn-purple: #d3869b;
+  --lcn-syn-magenta: #d3869b;
+  --lcn-syn-yellow: #fabd2f;
+  --lcn-syn-gray: #9f9285;
+
+  --lcn-ok: #b8bb26;
+  --lcn-warn: #fabd2f;
+  --lcn-err: #fb5f4c;
+  --lcn-info: #83a598;
+
+  --lcn-hue: 30;
+  --lcn-sat: 7%;
+}
